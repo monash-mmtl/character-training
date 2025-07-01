@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Models - Multi-Med Diagnostics</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <!-- Include marked.js library -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        /* Base styles from index.html */
+        body {
+            font-family: sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa; /* Light grey background */
+            color: #333; /* Dark grey text */
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto; /* Center content */
+            padding: 20px;
+        }
+
+        /* Navbar styles (identical to index.html) */
+        .navbar {
+            overflow: hidden;
+            padding: 15px 0;
+            display: flex; /* Use flexbox for layout */
+            justify-content: space-between; /* Push Home left, others right */
+            align-items: center; /* Vertically align items */
+            border-bottom: 1px solid #ddd; /* Add subtle border */
+        }
+        .navbar-left a {
+             color: #003366; /* Darker blue for Home */
+             text-decoration: none;
+             font-size: 18px;
+             font-weight: bold;
+        }
+        .navbar-right a {
+            color: #0d47a1; /* Dark blue text */
+            text-align: center;
+            padding: 0 10px; /* Adjust padding */
+            text-decoration: none;
+            font-size: 16px;
+            margin-left: 15px; /* Space between links */
+        }
+        .navbar a:hover {
+            text-decoration: underline;
+        }
+        /* Style for the active link in the right section */
+        .navbar-right a.active {
+            font-weight: bold;
+            color: #003366;
+        }
+        /* Style for the active Home link */
+        .navbar-left a.active {
+            text-decoration: underline; /* Example active style for Home */
+        }
+
+        /* Page specific styles */
+        h1 {
+            color: #003366; /* Darker blue consistent with landing */
+            margin-bottom: 30px;
+        }
+        h2 {
+             margin-top: 40px;
+             border-bottom: 1px solid #ddd; /* Subtle separator */
+             padding-bottom: 10px;
+             color: #333;
+        }
+
+        /* Form Styles */
+        #simulation-form {
+            background-color: #fff; /* White background for form */
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Subtle shadow */
+            margin-bottom: 30px;
+            display: flex;
+            gap: 15px; /* Space between form elements */
+            align-items: center;
+        }
+        #simulation-form label {
+            font-weight: bold;
+            margin-right: 5px;
+        }
+        #simulation-form select,
+        #simulation-form button {
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 1em;
+        }
+        #simulation-form button {
+            background-color: #1976d2; /* Blue button */
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        #simulation-form button:hover {
+             background-color: #0d47a1; /* Darker blue on hover */
+        }
+
+        /* Simulation Results Styles */
+        #simulation-results {
+            margin-top: 20px;
+        }
+        .case-container {
+            background-color: #fff;
+            padding: 15px; /* Setting consistent padding to 15px all around */
+            margin-bottom: 15px;
+            border-radius: 5px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            border: none; /* Explicitly remove border */
+        }
+
+        /* Notion-style Toggle */
+        .case-summary-line {
+            display: flex; /* Use flexbox for alignment */
+            align-items: center; /* Center align items vertically */
+            gap: 5px; /* Reduced gap slightly */
+            cursor: pointer; /* Indicate clickable */
+            margin: 0; /* Remove any margin */
+            padding: 0; /* Remove any padding */
+            border: none !important; /* Ensure no border */
+            border-bottom: none !important; /* Ensure no bottom border */
+        }
+        .case-summary-line h3 {
+             margin: 0; /* Explicitly remove default h3 margin */
+             padding: 0; /* Explicitly remove default h3 padding */
+             font-size: 1.1em; /* Slightly smaller heading */
+             line-height: 1; /* Match line height to font size */
+             border: none !important; /* Ensure no border */
+             border-bottom: none !important; /* Ensure no bottom border */
+        }
+        .notion-toggle {
+            width: 0;
+            height: 0;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-top: 6px solid #555; /* Triangle pointing down */
+            transition: transform 0.2s ease-in-out;
+            flex-shrink: 0; /* Prevent toggle from shrinking */
+        }
+        .notion-toggle.open {
+            transform: rotate(-90deg); /* Triangle pointing right */
+        }
+        .summary-text {
+             flex-grow: 1; /* Allow text to take available space */
+             color: #333;
+        }
+        .summary-text .correct {
+             color: green;
+             font-weight: bold;
+         }
+         .summary-text .incorrect {
+             color: red;
+             font-weight: bold;
+         }
+        .conversation-log {
+            margin-left: 25px; /* Slightly increased indent */
+            padding-left: 10px;
+            /* border-left: 1px solid #ccc; */ /* Keep border removed */
+            font-size: 0.95em; /* Slightly smaller log text */
+            color: #444;
+        }
+        .message-entry {
+            margin-bottom: 8px;
+        }
+        .message-entry strong {
+            color: #1a237e; /* Dark indigo for speaker name */
+        }
+        /* Style for INFO messages */
+        #simulation-results p i,
+        .info-message {
+            color: #666;
+            font-style: italic;
+        }
+        /* Style for ERROR messages */
+        #simulation-results p strong,
+        .error-message {
+            color: red;
+            font-weight: bold;
+        }
+        /* Force <strong> in conversation content to default color */
+        .message-entry .message-content strong {
+            color: inherit !important;
+            font-weight: bold;
+        }
+
+        /* Chat Modal Styles */
+        .chat-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7); /* Dim background */
+            display: none; /* Hidden by default */
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .chat-modal-content {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 800px;
+            height: 80%;
+            max-height: 600px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        .chat-modal-close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #555;
+        }
+        .chat-history {
+            flex-grow: 1;
+            overflow-y: auto;
+            margin-bottom: 15px;
+            border: 1px solid #eee;
+            padding: 10px;
+            background-color: #f9f9f9;
+        }
+        .chat-history .message-entry {
+            /* Use existing styles, maybe add more space */
+            margin-bottom: 12px;
+        }
+        .chat-input-area {
+            display: flex; /* Ensure flex display */
+            gap: 10px;
+            align-items: flex-end; /* Align items to bottom (good for multi-line text) */
+        }
+        .chat-input-area textarea {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            resize: none;
+            min-height: 40px; /* Minimum height */
+            max-height: 150px; /* Prevent excessive growth */
+            overflow-y: auto; /* Allow scrolling if content exceeds max-height */
+        }
+        .chat-input-area button {
+            /* Inherit from .blue-button */
+            flex-grow: 0; /* Don't grow */
+            flex-shrink: 0; /* Don't shrink */
+            padding: 0 15px; /* Adjust padding */
+            height: 40px; /* Keep height */
+            line-height: 40px; /* Center text vertically */
+            font-size: 0.9em;
+            /* Make button less wide */
+            width: 70px; /* Fixed width for the button */
+        }
+
+        /* Define a reusable blue button style */
+        .blue-button {
+            background-color: #1976d2; /* Blue button */
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            padding: 8px 12px; /* Match form button padding */
+            border-radius: 4px; /* Match form button radius */
+            font-size: 1em; /* Match form button font size */
+            text-align: center;
+        }
+        .blue-button:hover {
+             background-color: #0d47a1; /* Darker blue on hover */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav class="navbar">
+            <div class="navbar-left">
+                 <a href="/">Home</a> <!-- Home link added -->
+            </div>
+            <div class="navbar-right">
+                <a href="/about">About us</a>
+                <a href="/leaderboard">Leaderboard</a>
+                <a href="/methodology">Methodology</a>
+                <a href="/test" class="active">Test MedAI Models</a> <!-- Marked active -->
+            </div>
+        </nav>
+
+        <h1>Multi-Med Diagnostic Simulation</h1>
+
+        <form id="simulation-form">
+            <label for="doctor-model">Doctor Model:</label>
+            <select id="doctor-model" name="doctor_model">
+                {% for model in models %}
+                    <option value="{{ model }}">{{ model }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="case-file">Case File:</label>
+            <select id="case-file" name="case_file">
+                {% for case_file in cases_files %}
+                    <option value="{{ case_file }}">{{ case_file }}</option>
+                {% endfor %}
+            </select>
+
+            <button type="submit">Run Simulation</button>
+        </form>
+
+        <div id="simulation-results">
+            <!-- Case results will be added here -->
+        </div>
+    </div> <!-- Close container -->
+
+    <!-- Chat Modal Structure -->
+    <div id="chat-modal" class="chat-modal">
+        <div class="chat-modal-content">
+            <span class="chat-modal-close" onclick="closeChatModal()">&times;</span>
+            <h3 id="chat-modal-title">Chat</h3> <!-- Add ID for easier targeting -->
+            <div id="chat-history" class="chat-history">
+                <!-- Chat messages will be loaded here -->
+            </div>
+            <div class="chat-input-area">
+                <textarea id="chat-user-input" placeholder="Ask a question about the case..."></textarea>
+                <button id="chat-send-button">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('simulation-form');
+        const resultsDiv = document.getElementById('simulation-results');
+        const chatModal = document.getElementById('chat-modal');
+        const chatHistoryDiv = document.getElementById('chat-history');
+        const chatUserInput = document.getElementById('chat-user-input');
+        const chatSendButton = document.getElementById('chat-send-button');
+        const chatCaseNumSpan = document.getElementById('chat-case-number');
+        const chatModelNameSpan = document.getElementById('chat-model-name');
+
+        let currentEventSource = null;
+        let currentCaseNumber = 0;
+        let currentCaseLogDiv = null;
+        let simulationComplete = false; // Flag for normal completion
+        let caseDataStore = {}; // Store case details (history, model, results) by case number
+        let currentChatCaseNum = null;
+        let currentChatModelName = null;
+        let currentSimulationModel = null; // Store the model used for the current run
+        let simulationModelIsSet = false; // Flag to ensure model is set before processing cases
+        let pendingCaseStarts = []; // Queue for cases arriving before model is known
+
+        console.log("[Init] currentSimulationModel initialized to:", currentSimulationModel);
+        console.log("[Init] chatHistoryDiv element:", chatHistoryDiv); // DEBUG: Check initial selection
+
+        // Function to create HTML structure for a new case with Notion-style toggle
+        function createCaseStructure(caseNum) {
+            console.log(`[createCaseStructure ${caseNum}] Using currentSimulationModel:`, currentSimulationModel);
+            // Initialize data store, assigning the model for the current simulation run
+            caseDataStore[caseNum] = { history: [], model: currentSimulationModel, result: null };
+
+            const caseContainer = document.createElement('div');
+            caseContainer.id = `case-${caseNum}-container`;
+            caseContainer.className = 'case-container';
+            
+            // Enforce consistent padding to prevent shifting when loading completes
+            caseContainer.style.paddingTop = '15px';
+            caseContainer.style.paddingBottom = '15px';
+
+            const summaryLine = document.createElement('div');
+            summaryLine.className = 'case-summary-line';
+            summaryLine.dataset.caseNum = caseNum; // Add caseNum for click handling
+            summaryLine.style.display = 'flex';
+            summaryLine.style.alignItems = 'center';
+            summaryLine.style.gap = '5px';
+
+            const toggleElement = document.createElement('div');
+            toggleElement.className = 'notion-toggle open'; // Start open (triangle pointing right)
+            toggleElement.id = `case-${caseNum}-toggle`;
+
+            const summaryHeader = document.createElement('div'); // Changed from h3 to div
+            summaryHeader.id = `case-${caseNum}-summary`;
+            summaryHeader.className = 'summary-text';
+            summaryHeader.style.fontSize = '1.1em';
+            summaryHeader.style.fontWeight = 'bold';
+            // Format with "Case X | Loading..." to match the design in the loading state
+            summaryHeader.textContent = `Case ${caseNum} | Loading...`;
+
+            // Chat Button (initially hidden, shown on CASE_RESULT) - Simplified as a text link
+            const chatButton = document.createElement('a'); // Changed from button to anchor
+            chatButton.textContent = 'Chat';
+            chatButton.className = 'chat-button';
+            chatButton.style.marginLeft = 'auto'; // Push to the right
+            chatButton.style.display = 'none'; // Hide initially
+            chatButton.dataset.caseNum = caseNum;
+            chatButton.style.cursor = 'pointer';
+            
+            // Simplified styling - link-like appearance instead of button
+            chatButton.style.color = '#1976d2'; // Blue text
+            chatButton.style.textDecoration = 'none'; // No underline until hover
+            chatButton.style.fontSize = '1.1em'; // Match title font size
+            chatButton.style.fontWeight = 'normal';
+            chatButton.style.padding = '0'; // No padding
+            chatButton.style.background = 'none'; // No background
+            chatButton.style.border = 'none'; // No border
+            chatButton.style.flexGrow = '0'; // Don't grow
+            chatButton.style.flexShrink = '0'; // Don't shrink
+
+            // Add hover effect
+            chatButton.addEventListener('mouseenter', function() {
+                this.style.textDecoration = 'underline';
+            });
+            chatButton.addEventListener('mouseleave', function() {
+                this.style.textDecoration = 'none';
+            });
+
+            // Append toggle and summary header to the summary line
+            summaryLine.appendChild(toggleElement);
+            summaryLine.appendChild(summaryHeader);
+            summaryLine.appendChild(chatButton);
+
+            // Append the summary line and log div to the main container
+            caseContainer.appendChild(summaryLine);
+
+            // Create the log div here
+            const logDiv = document.createElement('div');
+            logDiv.id = `case-${caseNum}-log`;
+            logDiv.className = 'conversation-log';
+            logDiv.style.display = 'block'; // Start visible
+
+            // Append the log div *after* creating it
+            caseContainer.appendChild(logDiv);
+
+            // Append to the main results div
+            resultsDiv.appendChild(caseContainer);
+
+            return logDiv;
+        }
+
+        // Event Delegation for Toggle Click on the Summary Line
+        resultsDiv.addEventListener('click', (event) => {
+            // Find the closest ancestor which is a summary line
+            const summaryLine = event.target.closest('.case-summary-line');
+            if (summaryLine) {
+                const caseNum = summaryLine.dataset.caseNum;
+                const targetLogDiv = document.getElementById(`case-${caseNum}-log`);
+                const toggleElement = document.getElementById(`case-${caseNum}-toggle`);
+
+                if (targetLogDiv && toggleElement) {
+                    const isHidden = targetLogDiv.style.display === 'none';
+                    targetLogDiv.style.display = isHidden ? 'block' : 'none';
+                    // Toggle the 'open' class based on the *new* state (visible means open)
+                    toggleElement.classList.toggle('open', !isHidden);
+                } else {
+                    console.error(`Could not find log div or toggle for case ${caseNum}`);
+                }
+            }
+        });
+
+        // Function to add a message to the specific case log
+        function addMessageToLog(caseNum, speaker, text, isError = false, isInfo = false) {
+            const logDiv = document.getElementById(`case-${caseNum}-log`);
+            if (!logDiv) return; // Should not happen if structure is created first
+
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message-entry';
+            messageDiv.style.textAlign = 'left'; // Always align left
+
+            const strong = document.createElement('strong');
+            strong.textContent = `${speaker}: `;
+            messageDiv.appendChild(strong);
+
+            const contentSpan = document.createElement('span');
+            contentSpan.className = 'message-content';
+            // Render markdown for LLM responses, plain text for user/history
+            contentSpan.innerHTML = (speaker !== 'Patient' && speaker !== 'Doctor' && !isError && !isInfo) ? marked.parse(text) : text;
+            messageDiv.appendChild(contentSpan);
+
+            // Store message in history
+            if (caseDataStore[caseNum] && speaker !== 'SYSTEM' && !isError && !isInfo) {
+                caseDataStore[caseNum].history.push({ speaker: speaker, text: text });
+            }
+
+            logDiv.appendChild(messageDiv);
+        }
+
+        // Function to update the case summary title
+        function updateCaseSummary(caseNum, resultData) {
+            const summaryDiv = document.getElementById(`case-${caseNum}-summary`);
+            const chatButton = document.querySelector(`.chat-button[data-case-num='${caseNum}']`);
+            if (!summaryDiv || !chatButton) return;
+
+            const diagnosis = resultData.correct_diagnosis || 'N/A';
+            const outcome = resultData.is_correct ? 'Correct' : 'Incorrect';
+            const outcomeClass = resultData.is_correct ? 'correct' : 'incorrect';
+
+            // Clear the current content
+            summaryDiv.innerHTML = '';
+            
+            // Create the text node for the case number and diagnosis
+            const textNode = document.createTextNode(`${caseNum}. ${diagnosis} | `);
+            summaryDiv.appendChild(textNode);
+            
+            // Create a span for the outcome with the appropriate class
+            const outcomeSpan = document.createElement('span');
+            outcomeSpan.className = outcomeClass;
+            outcomeSpan.textContent = outcome;
+            summaryDiv.appendChild(outcomeSpan);
+            
+            // Ensure consistent styling 
+            summaryDiv.style.fontSize = '1.1em';
+            summaryDiv.style.fontWeight = 'bold';
+
+            // Store result and show chat button
+            caseDataStore[caseNum].result = resultData;
+            chatButton.style.display = 'inline-block'; // Show chat button
+            
+            // Ensure the case container maintains consistent padding
+            const caseContainer = document.getElementById(`case-${caseNum}-container`);
+            if (caseContainer) {
+                caseContainer.style.paddingTop = '15px';
+                caseContainer.style.paddingBottom = '15px';
+            }
+        }
+
+        // --- Chat Modal Functions ---
+        function openChatModal(caseNum) {
+            const caseData = caseDataStore[caseNum];
+            console.log(`[openChatModal ${caseNum}] Retrieved caseData:`, JSON.stringify(caseData)); // Log the data found
+            if (!caseData || !caseData.model || !caseData.result) {
+                console.error(`[openChatModal ${caseNum}] Error: Case data, model name, or result not found!`, 'caseData:', caseData);
+                alert('Error: Case data, model name, or result data not found.');
+                return;
+            }
+
+            currentChatCaseNum = caseNum;
+            currentChatModelName = caseData.model;
+
+            // Find the title element *inside* the function
+            const chatModalTitle = document.getElementById('chat-modal-title');
+            if (!chatModalTitle) {
+                console.error("[openChatModal] Could not find element with ID 'chat-modal-title'!");
+                alert("Internal error: Could not update chat title.");
+                return;
+            }
+
+            // Format and set the modal title
+            const diagnosis = caseData.result.correct_diagnosis || 'N/A';
+            const outcome = caseData.result.is_correct ? 'Correct' : 'Incorrect';
+            const outcomeClass = caseData.result.is_correct ? 'correct' : 'incorrect';
+            chatModalTitle.innerHTML = `${caseNum}. ${diagnosis} | <span class="${outcomeClass}">${outcome}</span>`;
+
+            console.log("[openChatModal] chatHistoryDiv before clearing:", chatHistoryDiv); // DEBUG: Check element before use
+            if (!chatHistoryDiv) {
+                console.error("[openChatModal] chatHistoryDiv is null before clearing!");
+                alert("Internal Error: Cannot display chat history.");
+                return;
+            }
+            // Clear chat history using textContent
+            console.log("[openChatModal] Clearing chat history using textContent...");
+            chatHistoryDiv.textContent = '';
+
+            // Load initial conversation history into the chat modal
+            console.log(`[openChatModal] Loading history for case ${caseNum}:`, caseData.history);
+            caseData.history.forEach(turn => {
+                addMessageToChatModal(turn.speaker, turn.text);
+            });
+
+            chatUserInput.value = ''; // Clear input
+            chatModal.style.display = 'flex'; // Show modal
+            chatUserInput.focus();
+        }
+
+        function closeChatModal() {
+            chatModal.style.display = 'none';
+            currentChatCaseNum = null;
+            currentChatModelName = null;
+        }
+
+        function addMessageToChatModal(speaker, text, isUser = false) {
+            console.log(`[addMessageToChatModal] Speaker: ${speaker}, isUser: ${isUser}`);
+            const messageDiv = document.createElement('div');
+            if (!messageDiv) { console.error("[addMessageToChatModal] Failed to create messageDiv!"); return; }
+            messageDiv.className = 'message-entry';
+            messageDiv.style.textAlign = 'left'; // Always align left
+
+            const strong = document.createElement('strong');
+            if (!strong) { console.error("[addMessageToChatModal] Failed to create strong element!"); return; }
+            console.log(`[addMessageToChatModal] Setting textContent for speaker: ${speaker}`);
+            strong.textContent = `${speaker}: `;
+            messageDiv.appendChild(strong);
+
+            const contentSpan = document.createElement('span');
+            if (!contentSpan) { console.error("[addMessageToChatModal] Failed to create contentSpan element!"); return; }
+            contentSpan.className = 'message-content';
+            // Render markdown for LLM responses, plain text for user/history
+            console.log(`[addMessageToChatModal] Setting innerHTML for text (first 50 chars): ${String(text).substring(0, 50)}...`);
+            contentSpan.innerHTML = (speaker !== 'Patient' && speaker !== 'Doctor' && !isUser) ? marked.parse(text) : text;
+            messageDiv.appendChild(contentSpan);
+
+            if (!chatHistoryDiv) { console.error("[addMessageToChatModal] chatHistoryDiv became null before append!"); return; }
+            console.log(`[addMessageToChatModal] Appending messageDiv to chatHistoryDiv`);
+            chatHistoryDiv.appendChild(messageDiv);
+            chatHistoryDiv.scrollTop = chatHistoryDiv.scrollHeight; // Scroll to bottom
+            console.log(`[addMessageToChatModal] Finished adding message.`);
+        }
+
+        async function sendChatMessage() {
+            const userMessage = chatUserInput.value.trim();
+            if (!userMessage || !currentChatCaseNum || !currentChatModelName) return;
+
+            addMessageToChatModal('Supervisor (You)', userMessage, true);
+            chatUserInput.value = ''; // Clear input
+            chatUserInput.style.height = '40px'; // Reset height after sending
+            chatUserInput.disabled = true;
+            chatSendButton.disabled = true;
+            chatSendButton.textContent = 'Thinking...';
+
+            try {
+                const requestBody = {
+                    model_name: currentChatModelName,
+                    history: caseDataStore[currentChatCaseNum].history, // Send original history
+                    user_message: userMessage,
+                };
+                console.log("[sendChatMessage] Sending fetch request with body:", JSON.stringify(requestBody)); // Log the request body
+
+                const response = await fetch('/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(requestBody),
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.response) {
+                    addMessageToChatModal(currentChatModelName, data.response);
+                } else {
+                    addMessageToChatModal('SYSTEM', `Error: ${data.error || 'Unknown error'}`, false);
+                }
+            } catch (error) {
+                console.error('Chat fetch error:', error);
+                addMessageToChatModal('SYSTEM', `Error sending message: ${error.message}`, false);
+            }
+            finally {
+                chatUserInput.disabled = false;
+                chatSendButton.disabled = false;
+                chatSendButton.textContent = 'Send';
+                chatUserInput.focus();
+            }
+        }
+
+        // Function to process a CASE_START event (called immediately or later)
+        function processCaseStart(caseNum) {
+            if (!simulationModelIsSet) {
+                console.error(`[processCaseStart ${caseNum}] Attempted to process case before model was set!`);
+                return; // Should not happen with the queue logic, but safety check
+            }
+            console.log(`[processCaseStart ${caseNum}] Processing case start.`);
+            currentCaseLogDiv = createCaseStructure(caseNum); // createCaseStructure uses the now-set currentSimulationModel
+        }
+
+        // Attach listeners for chat
+        chatSendButton.addEventListener('click', sendChatMessage);
+        chatUserInput.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault(); // Prevent newline in textarea
+                sendChatMessage();
+            }
+        });
+
+        // Auto-resize textarea
+        chatUserInput.addEventListener('input', function() {
+            this.style.height = 'auto'; // Temporarily shrink
+            this.style.height = (this.scrollHeight) + 'px'; // Set to scroll height
+        });
+
+        // Add event listener for chat buttons (using event delegation)
+        resultsDiv.addEventListener('click', function(event) {
+            if (event.target.classList.contains('chat-button')) {
+                const caseNum = event.target.dataset.caseNum;
+                openChatModal(caseNum);
+            }
+        });
+
+        form.addEventListener('submit', (event) => {
+            event.preventDefault();
+            resultsDiv.innerHTML = ''; // Clear previous results
+            currentCaseNumber = 0;
+            currentCaseLogDiv = null;
+            simulationComplete = false; // Reset flag on new submission
+
+            if (currentEventSource) {
+                currentEventSource.close();
+            }
+
+            const doctorModel = document.getElementById('doctor-model').value;
+            const caseFile = document.getElementById('case-file').value;
+            const url = `/run?doctor_model=${encodeURIComponent(doctorModel)}&case_file=${encodeURIComponent(caseFile)}`;
+
+            currentEventSource = new EventSource(url);
+            simulationModelIsSet = false; // Reset flag for new simulation
+            chatSendButton.classList.add('blue-button'); // Ensure send button gets style on load
+            pendingCaseStarts = []; // Reset queue for new simulation
+            currentSimulationModel = null; // Reset model for new simulation
+
+            currentEventSource.onmessage = function(event) {
+                const data = event.data;
+                // console.log("SSE Received:", data); // Debugging
+
+                if (data.startsWith("CASE_START:")) {
+                    const caseNum = parseInt(data.split(':')[1], 10);
+                    currentCaseNumber = caseNum; // Keep track of current case
+                    if (simulationModelIsSet) {
+                        processCaseStart(caseNum);
+                    } else {
+                        console.log(`[CASE_START ${caseNum}] Model not set yet, queueing.`);
+                        pendingCaseStarts.push(caseNum);
+                    }
+                } else if (data.startsWith("CONVERSATION:")) {
+                    if (currentCaseLogDiv) {
+                        try {
+                            const messageData = JSON.parse(data.substring("CONVERSATION:".length));
+                            const name = messageData.name || "Unknown";
+                            const rawContent = messageData.content || "";
+
+                            // *** Store the message AND let addMessageToLog handle display ***
+                            addMessageToLog(currentCaseNumber, name, rawContent);
+                            // ******************************************************
+
+                        } catch (e) {
+                            console.error("Error processing conversation JSON:", e, "Data:", data);
+                            const errorElement = document.createElement('p');
+                            errorElement.className = 'error-message'; // Use error class
+                            errorElement.textContent = `Error displaying message: ${data}`;
+                            currentCaseLogDiv.appendChild(errorElement);
+                        }
+                    }
+                } else if (data.startsWith("CASE_RESULT:")) {
+                    try {
+                        const resultData = JSON.parse(data.substring("CASE_RESULT:".length));
+                        updateCaseSummary(resultData.case_number, resultData); // Update summary title and show chat button
+                        currentCaseLogDiv = null;
+                    } catch (e) {
+                        console.error("Error parsing case result:", e);
+                        const errorElement = document.createElement('p');
+                        errorElement.className = 'error-message'; // Use error class
+                        errorElement.textContent = `Error displaying case result: ${data}`;
+                        const errorTargetDiv = document.getElementById(`case-${currentCaseNumber}-container`) || resultsDiv;
+                        errorTargetDiv.appendChild(errorElement);
+                    }
+                } else if (data.startsWith("SIMULATION_START:")) {
+                    // Extract model name and message
+                    const messageData = data.substring(data.indexOf(':') + 1);
+                    const parts = messageData.split(':');
+                    if (parts.length >= 1 && parts[0].trim() !== '') { // Ensure model name part exists and isn't empty
+                        currentSimulationModel = parts[0]; // Store the model name for this run
+                        simulationModelIsSet = true; // Set the flag
+                        console.log("[SIMULATION_START] Set currentSimulationModel to:", currentSimulationModel);
+                        const displayMessage = parts.slice(1).join(':'); // Rejoin the rest for display
+                        resultsDiv.innerHTML = `<p><i>${displayMessage || 'Starting simulation...'}</i></p>`; // Add fallback text
+
+                        // Process any queued case starts
+                        console.log("[SIMULATION_START] Processing queued cases:", pendingCaseStarts);
+                        pendingCaseStarts.forEach(num => processCaseStart(num));
+                        pendingCaseStarts = []; // Clear queue
+                    } else {
+                        console.error("[SIMULATION_START] Could not parse model name from:", data);
+                        // Optionally set a default or handle error, but don't set flag
+                        resultsDiv.innerHTML = `<p><i>${messageData || 'Starting simulation...'}</i></p>`; // Fallback
+                    }
+                } else if (data.startsWith("INFO:")) {
+                     const infoElement = document.createElement('p');
+                     infoElement.className = 'info-message'; // Use info class
+                     // Display text after the prefix
+                     infoElement.textContent = data.substring(data.indexOf(':') + 1).trim();
+                     resultsDiv.appendChild(infoElement);
+                } else if (data.startsWith("SIMULATION_END:")) {
+                     const endElement = document.createElement('p');
+                     endElement.innerHTML = '<strong>--- All Cases Processed ---</strong>'; // Keep bold for emphasis
+                     resultsDiv.appendChild(endElement);
+                } else if (data === "SIMULATION_COMPLETE") {
+                    console.log("Simulation completed normally.");
+                    simulationComplete = true;
+                    if (currentEventSource) {
+                        currentEventSource.close(); // Now close the connection
+                        currentEventSource = null;
+                    }
+                } else if (data.startsWith("ERROR:")) {
+                     const errorElement = document.createElement('p');
+                     errorElement.className = 'error-message'; // Use error class
+                     errorElement.textContent = data; // Display full error message
+                     resultsDiv.appendChild(errorElement);
+                } else {
+                     // Handle unknown message types gracefully
+                     console.warn("Unknown SSE message type:", data);
+                     const unknownElement = document.createElement('p');
+                     unknownElement.className = 'info-message'; // Treat as info
+                     unknownElement.textContent = `Received unexpected data: ${data}`;
+                     (currentCaseLogDiv || resultsDiv).appendChild(unknownElement);
+                }
+            };
+
+            currentEventSource.onerror = function(error) {
+                console.error("EventSource failed:", error);
+                // Only show error if the simulation didn't complete normally
+                if (!simulationComplete) {
+                    const errorElement = document.createElement('p');
+                    errorElement.className = 'error-message'; // Use error class
+                    errorElement.textContent = 'Error connecting to stream or stream interrupted.';
+                    resultsDiv.appendChild(errorElement);
+                } else {
+                     console.log("EventSource closed after normal completion.");
+                }
+                if (currentEventSource) {
+                    currentEventSource.close();
+                    currentEventSource = null;
+                }
+            };
+        });
+    </script>
+</body>
+</html>

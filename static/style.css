@@ -1,0 +1,157 @@
+body {
+    font-family: sans-serif;
+    margin: 20px;
+    background-color: #f4f4f4;
+}
+
+h1 {
+    color: #333;
+    text-align: center;
+}
+
+form {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+select, button {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+
+button {
+    background-color: #5cb85c;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+button:hover {
+    background-color: #4cae4c;
+}
+
+h2 {
+    color: #555;
+    margin-top: 30px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+
+#conversation-log {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    height: 400px;
+    overflow-y: auto;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+#conversation-log p {
+    margin: 0 0 10px 0;
+    padding: 8px;
+    border-bottom: 1px solid #eee;
+    line-height: 1.4;
+}
+
+#conversation-log p:last-child {
+    border-bottom: none;
+}
+
+/* Styles for multi-case results */
+.case-container {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.case-container h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 1.1em;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 8px;
+}
+
+.toggle-button {
+    background-color: #6c757d;
+    color: white;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9em;
+    margin-bottom: 10px; /* Add space below button */
+}
+
+.toggle-button:hover {
+    background-color: #5a6268;
+}
+
+.conversation-log {
+    background: #f9f9f9; /* Slightly different background for nested log */
+    border: 1px solid #eee;
+    border-radius: 4px;
+    padding: 10px;
+    max-height: 300px; /* Limit height */
+    overflow-y: auto;
+    margin-top: 10px; /* Add space above log when visible */
+}
+
+.conversation-log p {
+    margin: 0 0 8px 0;
+    padding: 5px;
+    border-bottom: 1px dotted #eee;
+    font-size: 0.95em;
+}
+
+.conversation-log p:last-child {
+    border-bottom: none;
+}
+
+.diag {
+    font-style: italic;
+    color: #555;
+}
+
+.correct {
+    color: green;
+    font-weight: bold;
+}
+
+.incorrect {
+    color: red;
+    font-weight: bold;
+}
+
+/* Remove old strong styling for conversation log to prevent unwanted highlights */
+/* #conversation-log strong { color: #007bff; } */
+
+.message-entry .speaker-name {
+    font-weight: bold;
+    color: #007bff;
+    display: inline-block;
+    margin-bottom: 5px;
+}
+
+.message-entry .message-content strong {
+    /* Keep bold but default color */
+    color: inherit;
+    font-weight: bold;
+} 

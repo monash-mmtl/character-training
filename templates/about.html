@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - Multi-Med Diagnostics</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        /* Base styles from index.html */
+        body {
+            font-family: sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Navbar styles (identical to index.html) */
+        .navbar {
+            overflow: hidden;
+            padding: 15px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #ddd;
+        }
+        .navbar-left a {
+             color: #003366;
+             text-decoration: none;
+             font-size: 18px;
+             font-weight: bold;
+        }
+        .navbar-right a {
+            color: #0d47a1;
+            text-align: center;
+            padding: 0 10px;
+            text-decoration: none;
+            font-size: 16px;
+            margin-left: 15px;
+        }
+        .navbar a:hover {
+            text-decoration: underline;
+        }
+        .navbar-right a.active {
+            font-weight: bold;
+            color: #003366;
+        }
+        .navbar-left a.active {
+            text-decoration: underline;
+        }
+        h1 {
+            color: #003366; /* Consistent heading color */
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav class="navbar">
+             <div class="navbar-left">
+                 <a href="/">Home</a>
+            </div>
+            <div class="navbar-right">
+                <a href="/about" class="active">About us</a>
+                <a href="/leaderboard">Leaderboard</a>
+                <a href="/methodology">Methodology</a>
+                <a href="/test">Test MedAI Models</a>
+            </div>
+        </nav>
+
+        <h1>About Us</h1>
+        <p>This page is under construction.</p>
+    </div>
+</body>
+</html> 

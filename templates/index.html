@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Med Diagnostics - Home</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        /* Base styles */
+        body {
+            font-family: sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa; /* Light grey background */
+            color: #333; /* Dark grey text */
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto; /* Center content */
+            padding: 20px;
+        }
+
+        /* Navbar styles (right-aligned links, Home on left) */
+        .navbar {
+            overflow: hidden;
+            padding: 15px 0;
+            display: flex; /* Use flexbox for layout */
+            justify-content: space-between; /* Push Home left, others right */
+            align-items: center; /* Vertically align items */
+            border-bottom: 1px solid #ddd; /* Add subtle border */
+        }
+        .navbar-left a {
+             color: #003366; /* Darker blue for Home */
+             text-decoration: none;
+             font-size: 18px;
+             font-weight: bold;
+        }
+        .navbar-right a {
+            color: #0d47a1; /* Dark blue text */
+            text-align: center;
+            padding: 0 10px; /* Adjust padding */
+            text-decoration: none;
+            font-size: 16px;
+            margin-left: 15px; /* Space between links */
+        }
+        .navbar a:hover {
+            text-decoration: underline;
+        }
+        /* Style for the active link in the right section */
+        .navbar-right a.active {
+            font-weight: bold;
+            color: #003366;
+        }
+        /* Style for the active Home link */
+        .navbar-left a.active {
+            text-decoration: underline; /* Example active style for Home */
+        }
+
+        /* Landing page content styles */
+        .landing-content {
+            text-align: center;
+            padding: 80px 20px;
+        }
+        .landing-content h1 {
+            font-size: 3.5em;
+            color: #003366; /* Darker blue for heading */
+            margin-bottom: 20px;
+        }
+        .landing-content p {
+            font-size: 1.2em;
+            color: #555;
+            margin-bottom: 40px;
+        }
+        .cta-button {
+            background-color: #1976d2; /* Blue button */
+            color: white;
+            padding: 15px 30px;
+            font-size: 1.1em;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+        .cta-button:hover {
+            background-color: #0d47a1; /* Darker blue on hover */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav class="navbar">
+            <div class="navbar-left">
+                 <a href="/" class="active">Home</a>
+            </div>
+            <div class="navbar-right">
+                <a href="/about">About us</a>
+                <a href="/leaderboard">Leaderboard</a>
+                <a href="/methodology">Methodology</a>
+                <a href="/test">Test MedAI Models</a>
+            </div>
+        </nav>
+
+        <div class="landing-content">
+            <h1>The first clinician-centric AI</h1>
+            <p>Evaluate and compare medical AI models with realistic clinical case simulations.</p>
+            <a href="/test" class="cta-button">Start Testing Models</a>
+        </div>
+    </div>
+
+    <!-- No script needed for this landing page -->
+</body>
+</html> 

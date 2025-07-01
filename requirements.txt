@@ -1,0 +1,4 @@
+ag2[openai]
+ag2[gemini]
+python-dotenv 
+Flask 
